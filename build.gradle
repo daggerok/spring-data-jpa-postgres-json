@@ -1,0 +1,69 @@
+plugins {
+  id 'java'
+  id 'com.palantir.docker-run' version '0.26.0'
+  id 'org.springframework.boot' version '2.4.5'
+  id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+}
+
+group = 'com.github.daggerok'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '11'
+
+configurations {
+  compileOnly {
+    extendsFrom annotationProcessor
+  }
+}
+
+repositories {
+  maven { url 'https://repo.spring.io/release' }
+  mavenCentral()
+}
+
+dependencies {
+  implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+  implementation 'org.springframework.boot:spring-boot-starter-web'
+  implementation 'org.flywaydb:flyway-core'
+  compileOnly 'org.projectlombok:lombok'
+  runtimeOnly 'org.postgresql:postgresql'
+  annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+  annotationProcessor 'org.projectlombok:lombok'
+  testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+test {
+  useJUnitPlatform()
+  testLogging {
+    showExceptions = true
+    showStandardStreams = true
+    events(
+        org.gradle.api.tasks.testing.logging.TestLogEvent.PASSED,
+        org.gradle.api.tasks.testing.logging.TestLogEvent.SKIPPED,
+        org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED
+    )
+  }
+}
+
+dockerRun {
+  name 'postgres'
+  image 'postgres:11.12-alpine'
+  // volumes 'hostvolume': '/containervolume'
+  ports '5432:5432'
+  daemonize true
+  env 'POSTGRES_PASSWORD': 'mysecretpassword',
+      'POSTGRES_DB': 'coursedb',
+      'MYVAR2': 'MYVALUE2'
+  // command 'sleep', '100'
+  // arguments '--hostname=custom', '-P'
+}
+
+tasks.register('up') {
+  dependsOn('dockerRun')
+}
+
+tasks.register('down') {
+  dependsOn('dockerStop', 'dockerRemoveContainer')
+}
+
+dockerRemoveContainer.dependsOn(dockerStop)
+dockerRemoveContainer.mustRunAfter(dockerStop)
