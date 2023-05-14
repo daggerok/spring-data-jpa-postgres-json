@@ -1,13 +1,13 @@
 plugins {
   id 'java'
-  id 'com.palantir.docker-run' version '0.26.0'
-  id 'org.springframework.boot' version '2.4.5'
-  id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+  id 'com.palantir.docker-run' version '0.35.0'
+  id 'org.springframework.boot' version '2.7.11'
+  id 'io.spring.dependency-management' version '1.0.15.RELEASE'
 }
 
-group = 'com.github.daggerok'
-version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '11'
+group = 'io.github.daggerok'
+version = '0.0.2-SNAPSHOT'
+sourceCompatibility = '17'
 
 configurations {
   compileOnly {
@@ -16,7 +16,6 @@ configurations {
 }
 
 repositories {
-  maven { url 'https://repo.spring.io/release' }
   mavenCentral()
 }
 
@@ -31,7 +30,7 @@ dependencies {
   testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
-test {
+tasks.named('test') {
   useJUnitPlatform()
   testLogging {
     showExceptions = true
@@ -42,6 +41,8 @@ test {
         org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED
     )
   }
+  dependsOn("up")
+  finalizedBy("down")
 }
 
 dockerRun {
@@ -50,9 +51,9 @@ dockerRun {
   // volumes 'hostvolume': '/containervolume'
   ports '5432:5432'
   daemonize true
-  env 'POSTGRES_PASSWORD': 'mysecretpassword',
-      'POSTGRES_DB': 'coursedb',
-      'MYVAR2': 'MYVALUE2'
+  env 'POSTGRES_PASSWORD': 'pg-json',
+      'POSTGRES_USER': 'pg-json',
+      'POSTGRES_DB': 'pg-json'
   // command 'sleep', '100'
   // arguments '--hostname=custom', '-P'
 }

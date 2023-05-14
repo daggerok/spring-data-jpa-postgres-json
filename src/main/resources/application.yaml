@@ -1,0 +1,11 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://127.0.0.1:5432/pg-json
+    username: pg-json
+    password: pg-json
+  jpa:
+    properties:
+      hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
+    hibernate.ddl-auto: create-drop
+  flyway:
+    fail-on-missing-locations: false

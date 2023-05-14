@@ -3,17 +3,18 @@ on:
   push:
     branches: [ master ]
   pull_request:
-    branches: [ master ]
     paths:
       - 'pom.xml'
       - '*.gradle'
       - 'src/**'
+env:
+  JAVA_VERSION: 17
 jobs:
-  tests:
+  dependencies:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/cache@v2
+      - uses: actions/checkout@v3
+      - uses: actions/cache@v3
         id: ci
         with:
           path: |
@@ -23,10 +24,31 @@ jobs:
             ~/.gradle
             ~/.docker
             ~/.m2/repository
-            !~/.m2/repository/com/gituhb/daggerok
-          key: ${{ runner.os }}-${{ hashFiles('**/build.gradle') }}
-      - uses: actions/setup-java@v1
+            !~/.m2/repository/*/gituhb/daggerok
+          key: ${{ hashFiles('**/*.gradle', '**/pom.xml') }}-
+      - uses: actions/setup-java@v3
         with:
-          java-version: 11
+          distribution: 'temurin'
+          java-version: ${{ env.JAVA_VERSION }}
       - run: ./gradlew dependencies
-      - run: ./gradlew up clean processResources test down
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/cache@v3
+        id: ci
+        with:
+          path: |
+            ~/.npm
+            ~/.node
+            ~/.local
+            ~/.gradle
+            ~/.docker
+            ~/.m2/repository
+            !~/.m2/repository/*/gituhb/daggerok
+          key: ${{ hashFiles('**/*.gradle', '**/pom.xml') }}-
+      - uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: ${{ env.JAVA_VERSION }}
+      - run: ./gradlew clean test

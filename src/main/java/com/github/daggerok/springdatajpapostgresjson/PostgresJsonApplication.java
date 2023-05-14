@@ -4,10 +4,9 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class SpringDataJpaPostgresJsonApplication {
+public class PostgresJsonApplication {
 
   public static void main(String[] args) {
-    SpringApplication.run(SpringDataJpaPostgresJsonApplication.class, args);
+    SpringApplication.run(PostgresJsonApplication.class, args);
   }
-
 }

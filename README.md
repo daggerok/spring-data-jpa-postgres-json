@@ -5,7 +5,8 @@ Spring MVC, Docker and Gradle
 ## Development
 
 ```bash
-./gradlew up clean test down
+#./gradlew clean up test down
+./gradlew clean test
 ```
 
 ## Docker tasks
