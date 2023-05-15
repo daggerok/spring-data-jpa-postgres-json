@@ -1,4 +1,4 @@
-package com.github.daggerok.springdatajpapostgresjson;
+package io.github.daggerok.json;
 
 import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Test;

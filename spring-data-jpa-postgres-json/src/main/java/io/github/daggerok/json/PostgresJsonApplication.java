@@ -1,4 +1,4 @@
-package com.github.daggerok.springdatajpapostgresjson;
+package io.github.daggerok.json;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -68,7 +68,7 @@ abstract class BaseDomainEventEntity implements Serializable {
 class UserEvent extends BaseDomainEventEntity {
 
     @Type(type = "jsonb")
-    @Column(columnDefinition = "jsonb")
+    @Column(columnDefinition = "json")
     private EventData data;
 }
 

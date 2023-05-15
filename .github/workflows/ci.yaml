@@ -30,7 +30,10 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: ${{ env.JAVA_VERSION }}
-      - run: ./gradlew dependencies
+      - run: |
+          for i in spring-data-jpa-postgres-jsonb spring-data-jpa-postgres-json ; do
+            ./gradlew -p $i dependencies ;
+          done
   tests:
     runs-on: ubuntu-latest
     steps:
@@ -51,4 +54,7 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: ${{ env.JAVA_VERSION }}
-      - run: ./gradlew clean test
+      - run: |
+          for i in spring-data-jpa-postgres-jsonb spring-data-jpa-postgres-json ; do
+            ./gradlew -p $i clean test ;
+          done

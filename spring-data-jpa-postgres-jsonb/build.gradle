@@ -1,0 +1,85 @@
+plugins {
+  id 'java'
+  id 'io.freefair.lombok' version '8.0.1'
+  id 'com.palantir.docker-run' version '0.35.0'
+  id 'org.springframework.boot' version '2.7.11'
+  id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+}
+
+group = 'io.github.daggerok'
+version = '0.0.2-SNAPSHOT'
+
+java {
+  targetCompatibility = JavaVersion.VERSION_1_8
+  sourceCompatibility = JavaVersion.VERSION_1_8
+}
+
+configurations {
+  compileOnly {
+    extendsFrom annotationProcessor
+  }
+}
+
+repositories {
+  mavenCentral()
+}
+
+dependencies {
+  implementation 'io.hypersistence:hypersistence-utils-hibernate-55:3.3.2'
+  implementation 'com.fasterxml.jackson.core:jackson-databind:2.12.7.1'
+  implementation 'com.fasterxml.jackson.module:jackson-module-jaxb-annotations:2.12.6'
+  //
+  implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+  implementation 'org.springframework.boot:spring-boot-starter-web'
+  implementation 'org.flywaydb:flyway-core'
+  //
+  annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+  //
+  runtimeOnly 'org.postgresql:postgresql'
+  //
+  compileOnly 'org.projectlombok:lombok'
+  annotationProcessor 'org.projectlombok:lombok'
+  testCompileOnly 'org.projectlombok:lombok'
+  testAnnotationProcessor 'org.projectlombok:lombok'
+  //
+  testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+tasks.named('test') {
+  useJUnitPlatform()
+  testLogging {
+    showExceptions = true
+    showStandardStreams = true
+    events(
+            org.gradle.api.tasks.testing.logging.TestLogEvent.PASSED,
+            org.gradle.api.tasks.testing.logging.TestLogEvent.SKIPPED,
+            org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED
+    )
+  }
+  dependsOn("up")
+  finalizedBy("down")
+}
+
+dockerRun {
+  name 'postgres'
+  image 'postgres:11.12-alpine'
+  // volumes 'hostvolume': '/containervolume'
+  ports '5432:5432'
+  daemonize true
+  env 'POSTGRES_PASSWORD': 'pg-json',
+      'POSTGRES_USER': 'pg-json',
+      'POSTGRES_DB': 'pg-json'
+  // command 'sleep', '100'
+  // arguments '--hostname=custom', '-P'
+}
+
+tasks.register('up') {
+  dependsOn('dockerRun')
+}
+
+tasks.register('down') {
+  dependsOn('dockerStop', 'dockerRemoveContainer')
+}
+
+dockerRemoveContainer.dependsOn(dockerStop)
+dockerRemoveContainer.mustRunAfter(dockerStop)
